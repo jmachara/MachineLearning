@@ -5,6 +5,8 @@ class Node:
         self.children = {}
 
 class Algorithms:
+    
+    
     def read_file(filepath):
         data_array = []
         datafile = open(filepath,'r')
@@ -18,17 +20,23 @@ class Algorithms:
             data_array.append(dict)
         datafile.close()
         return data_array,len(data_array[0])-1
+    
+    
     def make_attributes_array(i):
         return_array = []
         for counter in range(0,i):
             return_array.append(counter)
         return return_array
+    
+    
     def data_subset(data,variable,val):
         new_data = []
         for dict in data:
             if dict[variable] == val:
                 new_data.append(dict)
         return new_data
+    
+    
     def make_variable_dict(data,variable):
         ret_dict = {}
         for dict in data:
@@ -37,6 +45,8 @@ class Algorithms:
             else:
                 ret_dict[dict[variable]] = 1
         return ret_dict
+    
+    
     def get_most_common(dict):
         keys = list(dict.keys())
         most_common = keys[0]
@@ -46,27 +56,37 @@ class Algorithms:
                 most_common = keys[i]
                 num = dict[keys[i]]
         return most_common
+    
+    
     def label_check(data,label):
         first_label = data[0][label]
         for dict in data:
             if dict[label] != first_label:
                 return False
         return True
+    
+    
     def get_entropy(size,dict):
         entropy = 0
         for key in dict.keys():
             percent = (dict[key]/size)
             entropy -= (percent*math.log2(percent))
         return entropy
+    
+    
     def get_majority_error(size,dict):
         majority_error = 0
         mcv = Algorithms.get_most_common(dict)
         return (size-dict[mcv])/size
+    
+    
     def get_gini(size,dict):
         gini = 1
         for key in dict:
             gini -= (dict[key]/size)**2
         return gini
+    
+    
     def find_best_gain_e(data,attributes,label):
         label_dict = Algorithms.make_variable_dict(data,label)
         set_entropy = Algorithms.get_entropy(len(data),label_dict)
@@ -83,6 +103,8 @@ class Algorithms:
                 max_gain = gain
                 gain_attribute = attribute
         return gain_attribute
+    
+    
     def find_best_gain_me(data,attributes,label):
         label_dict = Algorithms.make_variable_dict(data,label)
         set_majority_error = Algorithms.get_majority_error(len(data),label_dict)
@@ -99,6 +121,8 @@ class Algorithms:
                 max_gain = gain
                 gain_attribute = attribute
         return gain_attribute
+    
+    
     def find_best_gain_g(data,attributes,label):
         label_dict = Algorithms.make_variable_dict(data,label)
         set_gini = Algorithms.get_gini(len(data),label_dict)
@@ -115,6 +139,8 @@ class Algorithms:
                 max_gain = gain
                 gain_attribute = attribute
         return gain_attribute
+    
+    
     def build_tree(data,attributes,label,node,depth,split):
         if depth == 1 or len(attributes) == 0:
             node.data = Algorithms.get_most_common(Algorithms.make_variable_dict(data,label))
@@ -142,37 +168,38 @@ class Algorithms:
                     attributes.append(best_gain)
                 node.children[key] = newNode
             return node
-    def build_tree_array(splits,depths,files):
+    
+    
+    def build_tree_array(splits,depths,file):
         tree_array = []
-        data_array = []
         label = []
         for split in splits:
             for depth in depths:
-                for file in files:
-                    data_label = Algorithms.read_file(file)
-                    attribute_array = Algorithms.make_attributes_array(data_label[1])
-                    tree_array.append(Algorithms.build_tree(data_label[0],attribute_array,data_label[1],Node(None),depth,split))
-                    data_array.append(data_label[0])
-                    label.append(data_label[1])
-        return tree_array,data_array,label
+                data_label = Algorithms.read_file(file)
+                attribute_array = Algorithms.make_attributes_array(data_label[1])
+                tree_array.append(Algorithms.build_tree(data_label[0],attribute_array,data_label[1],Node(None),depth,split))
+                label.append(data_label[1])
+        return tree_array,label
     def predict_label(tree,dict,label):
         dict_label = dict[label]
         current_node = tree
         while len(current_node.children) > 0:
             var = current_node.data
             branch = dict[var]
-            current_node = current_node.children[branch]
+            if branch in current_node.children.keys():
+                current_node = current_node.children[branch]
+            else:
+                return False
         return current_node.data == dict_label
-    def get_prediction_errors(var):
+    def get_prediction_errors(var,testing_data):
         i = 0
         return_array = []
-        for data in var[1]:
+        for tree in var[0]:
             error_counter = 0
-            tree = var[0][i]
-            label = var[2][i]
+            label = var[1][i]
             i +=1
-            data_length = len(data)
-            for dict in data:
+            data_length = len(testing_data)
+            for dict in testing_data:
                 if not Algorithms.predict_label(tree,dict,label):
                     error_counter+=1
             return_array.append(error_counter/data_length)
@@ -181,16 +208,25 @@ class Algorithms:
 test_splits = [1,2,3]
 split_names = ['information_gain','majority_error', 'gini_index']
 test_depths = [1,2,3,4,5,6]
-file_array = ['DecisionTree/car/test.csv','DecisionTree/car/train.csv']
+training_file = './car/train.csv'
+test_files = ['./car/train.csv','./car/test.csv']
 
-tree_array__data_array__label = Algorithms.build_tree_array(test_splits,test_depths,file_array)
-error_array = Algorithms.get_prediction_errors(tree_array__data_array__label)
-f = open("./DecisionTree/Decision_Tree_Data.txt","w")
+tree_array__label = Algorithms.build_tree_array(test_splits,test_depths,training_file)
+testing_data = []
 i = 0
-for file in file_array:
+for file in test_files:
+    testing_data.append(Algorithms.read_file(file)[0])
+error_array = []
+for data in testing_data:
+    error_array.append(Algorithms.get_prediction_errors(tree_array__label,data))
+f = open("./Decision_Tree_Data.txt","w")
+i = 0
+for file in test_files:
+    j = 0
     for split in split_names:
         for depth in test_depths:
-            f.write("file: "+file +" split: "+split+" depth: "+str(depth)+" error %: "+str(error_array[i]) + "\n")
-            i+=1
+            f.write("file: "+file +" split: "+split+" depth: "+str(depth)+" error %: "+str(error_array[i][j]) + "\n")
+            j+=1
+    i+=1
 f.close()
 
