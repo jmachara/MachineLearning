@@ -142,12 +142,55 @@ class Algorithms:
                     attributes.append(best_gain)
                 node.children[key] = newNode
             return node
+    def build_tree_array(splits,depths,files):
+        tree_array = []
+        data_array = []
+        label = []
+        for split in splits:
+            for depth in depths:
+                for file in files:
+                    data_label = Algorithms.read_file(file)
+                    attribute_array = Algorithms.make_attributes_array(data_label[1])
+                    tree_array.append(Algorithms.build_tree(data_label[0],attribute_array,data_label[1],Node(None),depth,split))
+                    data_array.append(data_label[0])
+                    label.append(data_label[1])
+        return tree_array,data_array,label
+    def predict_label(tree,dict,label):
+        dict_label = dict[label]
+        current_node = tree
+        while len(current_node.children) > 0:
+            var = current_node.data
+            branch = dict[var]
+            current_node = current_node.children[branch]
+        return current_node.data == dict_label
+    def get_prediction_errors(var):
+        i = 0
+        return_array = []
+        for data in var[1]:
+            error_counter = 0
+            tree = var[0][i]
+            label = var[2][i]
+            i +=1
+            data_length = len(data)
+            for dict in data:
+                if not Algorithms.predict_label(tree,dict,label):
+                    error_counter+=1
+            return_array.append(error_counter/data_length)
+        return return_array
 
-test_split = 3
-test_depth = 6
-#return_vals = Algorithms.read_file('DecisionTree/car/train.csv')
-return_vals = Algorithms.read_file('DecisionTree/tennis.txt')
-attribute_array = Algorithms.make_attributes_array(return_vals[1])
-root_node = Algorithms.build_tree(return_vals[0],attribute_array,return_vals[1],Node(None),test_depth,test_split)
+test_splits = [1,2,3]
+split_names = ['information_gain','majority_error', 'gini_index']
+test_depths = [1,2,3,4,5,6]
+file_array = ['DecisionTree/car/test.csv','DecisionTree/car/train.csv']
 
+tree_array__data_array__label = Algorithms.build_tree_array(test_splits,test_depths,file_array)
+error_array = Algorithms.get_prediction_errors(tree_array__data_array__label)
+f = open("./DecisionTree/Decision_Tree_Data.txt","w")
+i = 0
+for file in file_array:
+    for split in split_names:
+        for depth in test_depths:
+            f.write("file: "+file +" split: "+split+" depth: "+str(depth)+" error %: "+str(error_array[i]) + "\n")
+            i+=1
+f.close()
 
