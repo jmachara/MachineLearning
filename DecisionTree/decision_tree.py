@@ -177,7 +177,7 @@ class Algorithms:
                 node.children[key] = newNode
             return node
     
-    #returns an array of trees and labels with every combination from the splits and depths on the file
+    #returns an array of trees and an array of labels with every combination from the splits and depths on the file
     def build_tree_array(splits,depths,file):
         tree_array = []
         label = []
@@ -215,31 +215,31 @@ class Algorithms:
                     error_counter+=1
             return_array.append(error_counter/data_length)
         return return_array
+    #writes the information about the file, split, depth, and error in an output file
+    def get_car_tree_errors():
+        test_splits = [1,2,3]
+        split_names = ['information_gain','majority_error', 'gini_index']
+        test_depths = [1,2,3,4,5,6]
+        training_file = './car/train.csv'
+        test_files = ['./car/train.csv','./car/test.csv']
 
-test_splits = [1,2,3]
-split_names = ['information_gain','majority_error', 'gini_index']
-test_depths = [1,2,3,4,5,6]
-training_file = './car/train.csv'
-test_files = ['./car/train.csv','./car/test.csv']
-
-tree_array__label = Algorithms.build_tree_array(test_splits,test_depths,training_file)
-testing_data = []
-i = 0
-for file in test_files:
-    testing_data.append(Algorithms.read_file(file)[0])
-error_array = []
-#gets the errors of the predictions into a 2d array
-
-for data in testing_data:
-    error_array.append(Algorithms.get_prediction_errors(tree_array__label,data))
-f = open("./Decision_Tree_Data.txt","w")
-i = 0
-for file in test_files:
-    j = 0
-    for split in split_names:
-        for depth in test_depths:
-            f.write("file: "+file +" split: "+split+" depth: "+str(depth)+" error %: "+str(error_array[i][j]) + "\n")
-            j+=1
-    i+=1
-f.close()
-
+        tree_array__label = Algorithms.build_tree_array(test_splits,test_depths,training_file)
+        testing_data = []
+        i = 0
+        for file in test_files:
+            testing_data.append(Algorithms.read_file(file)[0])
+        error_array = []
+        for data in testing_data:
+            error_array.append(Algorithms.get_prediction_errors(tree_array__label,data))
+        f = open("./Decision_Tree_Data.txt","w")
+        i = 0
+        for file in test_files:
+            j = 0
+            for split in split_names:
+                for depth in test_depths:
+                    f.write("file: "+file +"    split: "+split+"    depth: "+str(depth)+"   error %: "+str(error_array[i][j]) + "\n")
+                    j+=1
+                f.write("\n")
+            i+=1
+        f.close()
+Algorithms.get_car_tree_errors()
