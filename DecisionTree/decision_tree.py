@@ -447,7 +447,7 @@ class Algorithms:
         error_array = []
         for data in testing_data:
             error_array.append(Algorithms.get_prediction_errors(tree_array__label,data,False))
-        f = open("./Car_Data.txt","w")
+        f = open("./Data/Car_Data.txt","w")
         i = 0
         for file in test_files:
             j = 0
@@ -478,9 +478,9 @@ class Algorithms:
         for data in testing_data:
             error_array.append(Algorithms.get_prediction_errors(tree_array__label,data,True))
         if b:
-            f = open("./Bank_Data_b.txt","w")
+            f = open("./Data/Bank_Data_b.txt","w")
         else:
-            f = open("./Bank_Data.txt","w")
+            f = open("./Data/Bank_Data.txt","w")
         i = 0
         for file in test_files:
             j = 0
@@ -488,9 +488,9 @@ class Algorithms:
                 for depth in test_depths:
                     f.write("file: "+file +"    split: "+split+"    depth: "+str(depth)+"   error %: "+str(error_array[i][j]) + "\n")
                     j+=1
-                f.write("\n")
+                f.write("\n\n")
             i+=1
         f.close()
-#Algorithms.get_car_tree_errors()
-#Algorithms.get_bank_tree_errors(False)
+Algorithms.get_car_tree_errors()
+Algorithms.get_bank_tree_errors(False)
 Algorithms.get_bank_tree_errors(True)
