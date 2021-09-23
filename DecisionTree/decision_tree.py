@@ -10,7 +10,11 @@ class Node:
         self.children = {}
 
 class Algorithms:
-    
+    def is_numerical(attribute):
+        num_attributes = [0,5,9,11,12,13,14]
+        if attribute in num_attributes:
+            return True
+        return False
     #reads the file specified in filepath 
     # returns an array of dictionaries with all of the line data and the dictionary index for the label
     def read_file(filepath):
@@ -82,7 +86,8 @@ class Algorithms:
     
     #returns the majority error of the varaible that dict has values of
     def get_majority_error(size,dict):
-        majority_error = 0
+        if len(dict) == 0:
+            return 0
         mcv = Algorithms.get_most_common(dict)
         return (size-dict[mcv])/size
     
@@ -147,6 +152,102 @@ class Algorithms:
                 gain_attribute = attribute
         return gain_attribute
     
+        #finds attribute that provides the best gain to split on in data using entropy
+    def find_best_gain_e_binary(data,attributes,label):
+        label_dict = Algorithms.make_variable_dict(data,label)
+        set_entropy = Algorithms.get_entropy(len(data),label_dict)
+        max_gain = 0
+        gain_attribute = attributes[0]
+        for attribute in attributes:
+            gain = set_entropy
+            if Algorithms.is_numerical(attribute):
+                lower_array = []
+                upper_array = []
+                threshold = Algorithms.get_median(data,attribute)
+                for dict in data:
+                    if dict[attribute] < threshold:
+                        lower_array.append(dict)
+                    else:
+                        upper_array.append(dict)
+                lower_dict = Algorithms.make_variable_dict(lower_array,label)
+                gain -= (len(lower_array)/len(data))*Algorithms.get_entropy(len(lower_array),lower_dict)
+                upper_dict = Algorithms.make_variable_dict(upper_array,label)
+                gain -= (len(upper_array)/len(data))*Algorithms.get_entropy(len(upper_array),upper_dict)
+            else:
+                var_dict = Algorithms.make_variable_dict(data,attribute)
+                for key in var_dict.keys():
+                    subset = Algorithms.data_subset(data,attribute,key)
+                    subset_dict = Algorithms.make_variable_dict(subset,label)
+                    gain -= ((var_dict[key]/len(data))*Algorithms.get_entropy(len(subset),subset_dict))
+            if gain > max_gain:
+                max_gain = gain
+                gain_attribute = attribute
+        return gain_attribute
+    
+    #finds attribute that provides the best gain to split on in data using majority error
+    def find_best_gain_me_binary(data,attributes,label):
+        label_dict = Algorithms.make_variable_dict(data,label)
+        set_majority_error = Algorithms.get_majority_error(len(data),label_dict)
+        max_gain = 0
+        gain_attribute = attributes[0]
+        for attribute in attributes:
+            gain = set_majority_error
+            if Algorithms.is_numerical(attribute):
+                lower_array = []
+                upper_array = []
+                threshold = Algorithms.get_median(data,attribute)
+                for dict in data:
+                    if dict[attribute] < threshold:
+                        lower_array.append(dict)
+                    else:
+                        upper_array.append(dict)
+                lower_dict = Algorithms.make_variable_dict(lower_array,label)
+                gain -= (len(lower_array)/len(data))*Algorithms.get_majority_error(len(lower_array),lower_dict)
+                upper_dict = Algorithms.make_variable_dict(upper_array,label)
+                gain -= (len(upper_array)/len(data))*Algorithms.get_majority_error(len(upper_array),upper_dict)
+            else:
+                var_dict = Algorithms.make_variable_dict(data,attribute)
+                for key in var_dict.keys():
+                    subset = Algorithms.data_subset(data,attribute,key)
+                    subset_dict = Algorithms.make_variable_dict(subset,label)
+                    gain -= ((var_dict[key]/len(data))*Algorithms.get_majority_error(len(subset),subset_dict))
+            if gain > max_gain:
+                max_gain = gain
+                gain_attribute = attribute
+        return gain_attribute
+    
+    #finds attribute that provides the best gain to split on in data using gini index
+    def find_best_gain_g_binary(data,attributes,label):
+        label_dict = Algorithms.make_variable_dict(data,label)
+        set_gini = Algorithms.get_gini(len(data),label_dict)
+        max_gain = 0
+        gain_attribute = attributes[0]
+        for attribute in attributes:
+            gain = set_gini
+            if Algorithms.is_numerical(attribute):
+                lower_array = []
+                upper_array = []
+                threshold = Algorithms.get_median(data,attribute)
+                for dict in data:
+                    if dict[attribute] < threshold:
+                        lower_array.append(dict)
+                    else:
+                        upper_array.append(dict)
+                lower_dict = Algorithms.make_variable_dict(lower_array,label)
+                gain -= (len(lower_array)/len(data))*Algorithms.get_gini(len(lower_array),lower_dict)
+                upper_dict = Algorithms.make_variable_dict(upper_array,label)
+                gain -= (len(upper_array)/len(data))*Algorithms.get_gini(len(upper_array),upper_dict)
+            else:
+                var_dict = Algorithms.make_variable_dict(data,attribute)
+                for key in var_dict.keys():
+                    subset = Algorithms.data_subset(data,attribute,key)
+                    subset_dict = Algorithms.make_variable_dict(subset,label)
+                    gain -= ((var_dict[key]/len(data))*Algorithms.get_gini(len(subset),subset_dict))
+            if gain > max_gain:
+                max_gain = gain
+                gain_attribute = attribute
+        return gain_attribute
+    
     #builds the tree using the data provided. returns the root node
     def build_tree(data,attributes,label,node,depth,split):
         node.mcl = Algorithms.get_most_common(Algorithms.make_variable_dict(data,label))
@@ -176,7 +277,71 @@ class Algorithms:
                     attributes.append(best_gain)
                 node.children[key] = newNode
             return node
-    
+    def get_median(data,variable):
+        values = []
+        for dict in data:
+            values.append(dict[variable])
+        values.sort()
+        return values[int(len(values)/2)]
+    #builds the tree using the data provided. returns the root node
+    def build_binary_tree(data,attributes,label,node,depth,split):
+        node.mcl = Algorithms.get_most_common(Algorithms.make_variable_dict(data,label))
+        if depth == 1 or len(attributes) == 0:  
+            node.data = node.mcl  
+            return node
+        elif Algorithms.label_check(data,label):
+            node.data = data[0][label]
+            node.mcl = node.data
+            return node
+        else:
+            if split == 1:
+                best_gain = Algorithms.find_best_gain_e_binary(data,attributes,label)
+            elif split == 2:
+                best_gain = Algorithms.find_best_gain_me_binary(data,attributes,label)
+            else:
+                best_gain = Algorithms.find_best_gain_g_binary(data,attributes,label)
+            node.data = best_gain
+            if Algorithms.is_numerical(best_gain):
+                threshold = Algorithms.get_median(data,best_gain)
+                higher_subset = []
+                lower_subset = []
+                for dict in data:
+                    if dict[best_gain] < threshold:
+                        lower_subset.append(dict)
+                    else:
+                        higher_subset.append(dict)
+                upper_Node = Node(None)
+                lower_Node = Node(None)
+                if len(higher_subset) == 0:
+                    upper_Node.data = Algorithms.get_most_common(Algorithms.make_variable_dict(data,label))
+                    upper_Node.mcl = upper_Node.data
+                else:
+                    attributes.remove(best_gain)
+                    Algorithms.build_binary_tree(higher_subset,attributes,label,upper_Node,depth-1,split)
+                    attributes.append(best_gain)
+                if len(lower_subset) == 0:
+                    lower_Node.data = Algorithms.get_most_common(Algorithms.make_variable_dict(data,label))
+                    lower_Node.mcl = lower_Node.data
+                else:
+                    attributes.remove(best_gain)
+                    Algorithms.build_binary_tree(lower_subset,attributes,label,lower_Node,depth-1,split)
+                    attributes.append(best_gain)
+                node.children[threshold] = upper_Node
+                node.children[-5] = lower_Node
+            else:
+                split_dict = Algorithms.make_variable_dict(data,best_gain)
+                for key in split_dict.keys():
+                    data_subset = Algorithms.data_subset(data,best_gain,key)
+                    newNode = Node(None)
+                    if len(data_subset) == 0:
+                        newNode.data = Algorithms.get_most_common(Algorithms.make_variable_dict(data,label))
+                        newNode.mcl = newNode.data
+                    else:
+                        attributes.remove(best_gain)
+                        Algorithms.build_binary_tree(data_subset,attributes,label,newNode,depth-1,split)
+                        attributes.append(best_gain)
+                    node.children[key] = newNode
+            return node
     #returns an array of trees and an array of labels with every combination from the splits and depths on the file
     def build_tree_array(splits,depths,file):
         tree_array = []
@@ -188,6 +353,51 @@ class Algorithms:
                 tree_array.append(Algorithms.build_tree(data_label[0],attribute_array,data_label[1],Node(None),depth,split))
                 label.append(data_label[1])
         return tree_array,label
+    
+        #returns an array of trees and an array of labels with every combination from the splits and depths on the file
+    def clean_data(data,attributes):
+        for key in attributes:
+            varDict = Algorithms.make_variable_dict(data,key)
+            varDict['unknown'] = 0
+            mcv = Algorithms.get_most_common(varDict)
+            for dict in data:
+                if dict[key] == 'unknown':
+                    dict[key] = mcv
+        return data
+    def build_binary_tree_array(splits,depths,file,b):
+        tree_array = []
+        label = []
+        for split in splits:
+            for depth in depths:
+                data_label = Algorithms.read_file(file)
+                attribute_array = Algorithms.make_attributes_array(data_label[1])
+                if b:
+                    clean_data = Algorithms.clean_data(data_label[0],attribute_array)
+                    tree_array.append(Algorithms.build_binary_tree(clean_data,attribute_array,data_label[1],Node(None),depth,split))
+                else:
+                    tree_array.append(Algorithms.build_binary_tree(data_label[0],attribute_array,data_label[1],Node(None),depth,split))
+                label.append(data_label[1])
+        return tree_array,label
+
+   # returns if the value of the label is the same as the predicted value from the tree.
+    def predict_binary_label(tree,dict,label):
+        dict_label = dict[label]
+        current_node = tree
+        while len(current_node.children) > 0:
+            var = current_node.data
+            branch = dict[var]
+            if Algorithms.is_numerical(var):
+                for key in current_node.children.keys():
+                    if key != -5:
+                        if branch < key:
+                            current_node = current_node.children[-5]
+                        else:
+                            current_node = current_node.children[key]
+            elif branch in current_node.children.keys():
+                current_node = current_node.children[branch]
+            else:
+                return dict_label == current_node.mcl
+        return current_node.data == dict_label 
     # returns if the value of the label is the same as the predicted value from the tree.
     def predict_label(tree,dict,label):
         dict_label = dict[label]
@@ -202,7 +412,7 @@ class Algorithms:
         return current_node.data == dict_label
     #returns the number of lines that don't get the correct prediction from the tree
     #var has an array of trees as its 0 index, and the array of labels in its second index
-    def get_prediction_errors(var,testing_data):
+    def get_prediction_errors(var,testing_data,binary):
         i = 0
         return_array = []
         for tree in var[0]:
@@ -210,10 +420,16 @@ class Algorithms:
             label = var[1][i]
             i +=1
             data_length = len(testing_data)
-            for dict in testing_data:
-                if not Algorithms.predict_label(tree,dict,label):
-                    error_counter+=1
-            return_array.append(error_counter/data_length)
+            if binary:
+                for dict in testing_data:
+                    if not Algorithms.predict_binary_label(tree,dict,label):
+                        error_counter+=1
+                return_array.append(error_counter/data_length)
+            else:
+                for dict in testing_data:
+                    if not Algorithms.predict_label(tree,dict,label):
+                        error_counter+=1
+                return_array.append(error_counter/data_length)
         return return_array
     #writes the information about the file, split, depth, and error in an output file
     def get_car_tree_errors():
@@ -230,8 +446,8 @@ class Algorithms:
             testing_data.append(Algorithms.read_file(file)[0])
         error_array = []
         for data in testing_data:
-            error_array.append(Algorithms.get_prediction_errors(tree_array__label,data))
-        f = open("./Decision_Tree_Data.txt","w")
+            error_array.append(Algorithms.get_prediction_errors(tree_array__label,data,False))
+        f = open("./Car_Data.txt","w")
         i = 0
         for file in test_files:
             j = 0
@@ -242,4 +458,39 @@ class Algorithms:
                 f.write("\n")
             i+=1
         f.close()
-Algorithms.get_car_tree_errors()
+    def get_bank_tree_errors(b):
+        test_splits = [1,2,3]
+        split_names = ['information_gain','majority_error', 'gini_index']
+        test_depths = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+        training_file = './bank/train.csv'
+        test_files = ['./bank/train.csv','./bank/test.csv']
+
+        tree_array__label = Algorithms.build_binary_tree_array(test_splits,test_depths,training_file,b)
+        testing_data = []
+        i = 0
+        for file in test_files:
+            td = Algorithms.read_file(file)
+            if b:
+                testing_data.append(Algorithms.clean_data(td[0],Algorithms.make_attributes_array(td[1])))
+            else:
+                testing_data.append(td[0])
+        error_array = []
+        for data in testing_data:
+            error_array.append(Algorithms.get_prediction_errors(tree_array__label,data,True))
+        if b:
+            f = open("./Bank_Data_b.txt","w")
+        else:
+            f = open("./Bank_Data.txt","w")
+        i = 0
+        for file in test_files:
+            j = 0
+            for split in split_names:
+                for depth in test_depths:
+                    f.write("file: "+file +"    split: "+split+"    depth: "+str(depth)+"   error %: "+str(error_array[i][j]) + "\n")
+                    j+=1
+                f.write("\n")
+            i+=1
+        f.close()
+#Algorithms.get_car_tree_errors()
+#Algorithms.get_bank_tree_errors(False)
+Algorithms.get_bank_tree_errors(True)
