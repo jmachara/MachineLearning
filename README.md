@@ -24,3 +24,23 @@ Using DecisionTree:
          this point in the tree, and children which is a dictionary of the branches. 
          
 To learn the tree with binary data, use the method build_binary_tree() instead. Build_tree_array can be used to create many trees with varying data. The parameters are an array of splits, array of depths, and the array of files. 
+
+Homework 2:
+
+  You can run the code with the run.sh file provided, which moves the current directory into the file's folder and runs it to produce the text files. If you want to use the code without the run.sh file, follow the steps below
+  
+ Adaboost:
+    To run the Adaboost code, call the stump_boost method in the methods class. This calls the adaboost algorithm on the bank data
+Bagged Trees:
+    To run the bagged trees code, call the bagging method in the methods class. This builds the tree groups and tests them. 
+Random Forest:
+        To run the random forest code, call the bagging_RandForest method in the methods class. This builds the rand tree groups and tests them. 
+Intensive tests:
+        The intensive bagged trees test is ran using the IntensiveBagging method in the methods class. For the random tree intensive method, run rand_tree_intensive_bagging.
+        This generates specification of the intensive testing from homework 2, but instead of 500, I used 100 due to time limitations. 
+Batch Gradient:
+        This can be called using the batch_grad_des method that has a parameter for the step. .01 was the chosen value for this parameter. 
+Stochastic Gradient:
+        This can be called using the stochastic_grad_des method that has a parameter for the step. .01 was the chosen value for this parameter.
+Analytical:
+        To calculate the best weight vector analytically, use the analytical_weight function. 
