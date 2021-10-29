@@ -23,5 +23,4 @@ Using DecisionTree:
      5. Each node in the tree has 3 variables: data which is the dictionary key of the data to split on, mcl which is the most common label of the outcomes at 
          this point in the tree, and children which is a dictionary of the branches. 
          
-To learn the tree with binary data, use the method build_binary_tree() instead. Build_tree_array can be used to create many trees with varying data. The parameters are an 
-array of splits, array of depths, and the array of files. 
+To learn the tree with binary data, use the method build_binary_tree() instead. Build_tree_array can be used to create many trees with varying data. The parameters are an array of splits, array of depths, and the array of files. 
