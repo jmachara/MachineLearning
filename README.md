@@ -6,7 +6,7 @@ Using DecisionTree:
   Learning a Tree:
     The steps to learning a tree with my code are as follows:
     
-      1. Use Algorithms.read_file() with the filename as its parameter to get a list of the data in dictionaries as the first index of the return value, and the dictionary index
+  1. Use Algorithms.read_file() with the filename as its parameter to get a list of the data in dictionaries as the first index of the return value, and the dictionary index
         for the label of the data as the second value. 
         
         
