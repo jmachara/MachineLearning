@@ -9,8 +9,6 @@ class Node:
         self.mcl = None
         self.children = {}
 class DecTree:
-    def __init__(self):
-        pass
     #Returns if the attribute is numberical for the bank data set
     def is_numerical(attribute):
         num_attributes = [0,5,9,11,12,13,14]
@@ -481,6 +479,6 @@ class methods:
                 f.write("\n\n")
             i+=1
         f.close()
-#methods.get_car_tree_errors()
-#methods.get_bank_tree_errors(False)
-#methods.get_bank_tree_errors(True)
+methods.get_car_tree_errors()
+methods.get_bank_tree_errors(False)
+methods.get_bank_tree_errors(True)
