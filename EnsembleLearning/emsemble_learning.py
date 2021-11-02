@@ -7,8 +7,6 @@ class Node:
         self.mcl = None
         self.children = {}
 class DecTree:
-    def __init__(self):
-        pass
     #Returns if the attribute is numberical for the bank data set
     def is_numerical(attribute):
         num_attributes = [0,5,9,11,12,13,14]
@@ -828,5 +826,4 @@ methods.IntensiveBagging()
 methods.stump_boost()
 methods.bagging()
 methods.bagging_RandForest()
-methods.IntensiveBagging()
 methods.rand_tree_intensive_bagging()
