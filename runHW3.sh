@@ -2,5 +2,5 @@
 #script for homework 3
 echo "linear Regression"
 cd Perceptron
-python perceptron.py
+python3 perceptron.py
 read
