@@ -56,3 +56,18 @@ Stochastic Gradient:
 
 Analytical:
         To calculate the best weight vector analytically, use the analytical_weight function. 
+
+Homework 3:
+        
+        You can run the code with the provided runHW3.sh file. This runs the perceptron.py file which runs the standard, voted, and average perceptron algorithms and prints their data on the command line. The code in perceptron is as follows:
+
+        standard_perceptron(r): standard perceptron algorithm, returns the weight vector. 
+
+        voted_perceptron(r): voted perceptron algorithm, returns the weight vectors, a dictionary containing the votes for each vector, and the count. 
+
+        average_perceptron(r): average perceptron algorithm, reutnrs the weight vector.
+
+        get_voted_error(w_dict, C, m): returns the error of the voted perceptron algorithm return. 
+
+        get_perceptron_error(w): returns the error of the standard and average perceptron vectors. 
+
