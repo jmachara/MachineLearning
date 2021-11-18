@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.lib.function_base import average
 import pandas as pd
-import random as rnd
 class perceptron:
     def standard_perceptron(r):
         data = pd.read_csv('./Data/train.csv')
