@@ -70,4 +70,12 @@ Homework 3:
         get_voted_error(w_dict, C, m): returns the error of the voted perceptron algorithm return. 
 
         get_perceptron_error(w): returns the error of the standard and average perceptron vectors. 
+Homework 4:
+        To run the code for the assigment use the provided runHW4.sh file. 
 
+        General code usage:
+                The stoc_svm function is used to run the stochasitc sub gradient svm for assignment 4, the dual_svm is for the dual domain part of the assignment. Dual svm takes in one boolean variable that indicates if it was part b of the question, if False it runs for part A which doesn't use the kernel function. 
+                
+                These methods use the stochastic_svm,svm_dual, and svm_dual_kernel to make a weight vector, and then use the the functions I provide such as get_error and get_kernel_error to find the errors respectively. You can change the values of the different parameters with the variables sent in, or by changing the code in the dual_svm and stoc_svm methods that use loops to try different values. 
+
+                There is also support to get the support vectors for the kernel svm, as well as comparing them to see how many are similar using the get_supp_vecs and comp_supp_vecs methods. 
